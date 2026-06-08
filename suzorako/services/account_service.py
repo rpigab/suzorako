@@ -60,14 +60,16 @@ async def build_account_tree(db: AsyncSession) -> list[dict]:
     all_accts = await get_all_accounts(db)
     by_id = {a["id"]: a for a in all_accts}
 
-    # Calcul de profondeur
+    # Calcul de profondeur (avec garde anti-cycle)
     def depth(acct: dict) -> int:
         d = 0
         current = acct
+        seen = {acct["id"]}
         while current["parent_id"] is not None:
             parent = by_id.get(current["parent_id"])
-            if parent is None:
+            if parent is None or parent["id"] in seen:
                 break
+            seen.add(parent["id"])
             d += 1
             current = parent
         return d

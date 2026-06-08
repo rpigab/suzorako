@@ -4,27 +4,29 @@
 {% block content %}
 <h2>{% if transaction %}Modifier la transaction{% else %}Nouvelle transaction{% endif %}</h2>
 
+{% if error %}
+<div class="imbalance-indicator unbalanced" role="alert">{{ error }}</div>
+{% endif %}
+
 <form
   method="post"
   action="{% if transaction %}/transactions/{{ transaction.id }}{% else %}/transactions{% endif %}"
   class="transaction-form"
   id="txn-form">
 
-  {% if prefill_account_id %}
-  <input type="hidden" name="redirect_account_id" value="{{ prefill_account_id }}">
+  {% if redirect_account_id %}
+  <input type="hidden" name="redirect_account_id" value="{{ redirect_account_id }}">
   {% endif %}
 
   <label>
     Date
-    <input type="date" name="post_date"
-      value="{{ transaction.post_date if transaction else today }}"
-      required>
+    <input type="date" name="post_date" value="{{ values.post_date }}" required>
   </label>
 
   <label>
     Description
     <input type="text" name="description"
-      value="{{ transaction.description if transaction else '' }}"
+      value="{{ values.description }}"
       list="descriptions-list"
       autocomplete="off"
       placeholder="Ex : Courses, Loyer, Salaire…"
@@ -38,23 +40,17 @@
 
   <label>
     Notes (optionnel)
-    <input type="text" name="notes" value="{{ transaction.notes if transaction else '' }}">
+    <input type="text" name="notes" value="{{ values.notes }}">
   </label>
 
   <hr>
-  <p><strong>Ventilations</strong></p>
+  <p><strong>Ventilations</strong> <small>— laissez un montant vide pour l'équilibrage automatique</small></p>
 
   <div id="splits-container">
-    {% if transaction %}
-      {% for i, sp in transaction.splits | enumerate %}
+    {% for sp in split_rows %}
+      {% set i = loop.index0 %}
       {% include "partials/split_row.html" %}
-      {% endfor %}
-    {% else %}
-      {% set i = 0 %}{% set sp = None %}
-      {% include "partials/split_row.html" %}
-      {% set i = 1 %}
-      {% include "partials/split_row.html" %}
-    {% endif %}
+    {% endfor %}
   </div>
 
   <div id="imbalance-indicator" class="imbalance-indicator unbalanced">
@@ -62,7 +58,7 @@
   </div>
 
   <button type="button"
-    hx-get="/transactions/split-row?idx={{ (transaction.splits | length) if transaction else 2 }}"
+    hx-get="/transactions/split-row?idx={{ split_rows | length }}"
     hx-target="#splits-container"
     hx-swap="beforeend"
     class="secondary outline"
@@ -77,15 +73,4 @@
     Annuler
   </a>
 </form>
-{% endblock %}
-
-{% block scripts %}
-<script>
-// Recalcul déséquilibre à chaque changement de montant
-document.getElementById('txn-form').addEventListener('change', function(e) {
-  if (e.target.name && e.target.name.startsWith('split_amount_')) {
-    htmx.trigger('#txn-form', 'balance-check');
-  }
-});
-</script>
 {% endblock %}

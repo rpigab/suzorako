@@ -4,20 +4,24 @@
 {% block content %}
 <h2>{% if account %}Modifier le compte{% else %}Nouveau compte{% endif %}</h2>
 
+{% if error %}
+<div class="imbalance-indicator unbalanced" role="alert">{{ error }}</div>
+{% endif %}
+
 <form method="post"
       action="{% if account %}/accounts/{{ account.id }}{% else %}/accounts{% endif %}"
       class="transaction-form">
 
   <label>
     Nom du compte
-    <input type="text" name="name" value="{{ account.name if account else '' }}" required autofocus>
+    <input type="text" name="name" value="{{ values.name }}" required autofocus>
   </label>
 
   <label>
     Type de compte
-    <select name="account_type" required>
+    <select name="account_type" id="account-type-select" required>
       {% for t in types %}
-      <option value="{{ t }}" {% if account and account.account_type == t %}selected{% endif %}>
+      <option value="{{ t }}" {% if values.account_type == t %}selected{% endif %}>
         {{ type_labels[t] }}
       </option>
       {% endfor %}
@@ -26,15 +30,16 @@
 
   <label>
     Compte parent
-    <select name="parent_id">
-      <option value="">— aucun (compte racine) —</option>
+    <select name="parent_id" id="parent-select">
+      <option value="" data-type="">— aucun (compte racine) —</option>
       {% for a in all_accounts %}
-      <option value="{{ a.id }}"
-        {% if account and account.parent_id == a.id %}selected{% endif %}>
+      <option value="{{ a.id }}" data-type="{{ a.account_type }}"
+        {% if values.parent_id == a.id %}selected{% endif %}>
         {{ a.name }} ({{ type_labels[a.account_type] }})
       </option>
       {% endfor %}
     </select>
+    <small>Un sous-compte doit être du même type que son parent.</small>
   </label>
 
   <label>
@@ -43,7 +48,7 @@
       <option value="">— EUR par défaut —</option>
       {% for c in commodities %}
       <option value="{{ c.id }}"
-        {% if account and account.commodity_id == c.id %}selected{% endif %}>
+        {% if values.commodity_id == c.id %}selected{% endif %}>
         {{ c.mnemonic }} — {{ c.fullname or c.mnemonic }}
       </option>
       {% endfor %}
@@ -52,20 +57,45 @@
 
   <label>
     Description
-    <input type="text" name="description" value="{{ account.description if account else '' }}">
+    <input type="text" name="description" value="{{ values.description }}">
   </label>
 
   <label style="display:flex;align-items:center;gap:0.5rem;">
     <input type="checkbox" name="placeholder" value="1"
-      {% if account and account.placeholder %}checked{% endif %}
+      {% if values.placeholder %}checked{% endif %}
       style="width:auto;">
     Compte de regroupement (pas de saisie directe)
   </label>
-  <input type="hidden" name="placeholder" value="0">
 
   <div style="display:flex;gap:0.75rem;margin-top:1rem;">
     <button type="submit">{% if account %}Enregistrer{% else %}Créer{% endif %}</button>
     <a href="/accounts" role="button" class="secondary">Annuler</a>
   </div>
 </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Le menu parent ne propose que les comptes du même type que le compte édité.
+(function () {
+  const typeSel = document.getElementById('account-type-select');
+  const parentSel = document.getElementById('parent-select');
+
+  function filterParents() {
+    const type = typeSel.value;
+    for (const opt of parentSel.options) {
+      const optType = opt.dataset.type;
+      const ok = optType === '' || optType === type;
+      opt.hidden = !ok;
+      opt.disabled = !ok;
+      if (!ok && opt.selected) {
+        parentSel.value = '';  // le parent devenu incompatible est désélectionné
+      }
+    }
+  }
+
+  typeSel.addEventListener('change', filterParents);
+  filterParents();
+})();
+</script>
 {% endblock %}

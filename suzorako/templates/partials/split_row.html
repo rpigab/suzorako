@@ -18,10 +18,9 @@
       <option value="">— Choisir un compte —</option>
       {% for a in all_accounts %}
       <option value="{{ a.id }}"
-        {% if sp and sp.account_id == a.id %}selected
-        {% elif i == 0 and prefill_account_id and a.id == prefill_account_id %}selected
-        {% endif %}>
-        {{ a.name }}
+        {% if a.placeholder %}disabled{% endif %}
+        {% if sp and sp.account_id == a.id %}selected{% endif %}>
+        {{ a.name }}{% if a.placeholder %} (regroupement){% endif %}
       </option>
       {% endfor %}
     </select>
@@ -32,8 +31,8 @@
       Montant (€)
       <input type="text" inputmode="decimal"
         name="split_amount_{{ i }}"
-        value="{% if sp %}{{ (sp.value_num / sp.value_denom) | round(2) }}{% endif %}"
-        placeholder="0.00"
+        value="{{ sp.amount_str if sp else '' }}"
+        placeholder="auto"
         hx-post="/transactions/check-balance"
         hx-target="#imbalance-indicator"
         hx-include="#txn-form"
