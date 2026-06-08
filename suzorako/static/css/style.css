@@ -1,0 +1,311 @@
+:root {
+  --nav-height: 56px;
+}
+
+/* Navigation */
+nav.top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--pico-background-color);
+  border-bottom: 1px solid var(--pico-muted-border-color);
+  padding: 0 1rem;
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+nav.top-nav a {
+  text-decoration: none;
+  font-weight: 500;
+  color: var(--pico-contrast);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--pico-border-radius);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+nav.top-nav a:hover,
+nav.top-nav a.active {
+  background: var(--pico-primary-background);
+  color: var(--pico-primary-inverse);
+}
+
+nav.top-nav .brand {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-right: auto;
+}
+
+/* Layout */
+main {
+  padding: 1rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Account tree */
+.account-tree {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.account-tree li {
+  border-bottom: 1px solid var(--pico-muted-border-color);
+}
+
+.account-tree .account-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.5rem;
+  min-height: 44px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.account-tree .account-row:hover {
+  background: var(--pico-card-background-color);
+}
+
+.account-row .account-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.account-row .account-balance {
+  font-family: monospace;
+  font-size: 0.95rem;
+  color: var(--pico-muted-color);
+}
+
+.account-row .account-balance.negative {
+  color: var(--pico-del-color);
+}
+
+.badge {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  background: var(--pico-secondary-background);
+  color: var(--pico-secondary-inverse);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.badge.asset     { background: #2d7a2d; color: #fff; }
+.badge.liability { background: #a03030; color: #fff; }
+.badge.income    { background: #1e5fa3; color: #fff; }
+.badge.expense   { background: #8a5c00; color: #fff; }
+.badge.equity    { background: #555; color: #fff; }
+
+/* Account type group headers */
+.account-group-header {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--pico-muted-color);
+  padding: 1rem 0.5rem 0.3rem;
+}
+
+/* Indentation for sub-accounts */
+.account-row[data-depth="1"] .account-name { padding-left: 1.25rem; }
+.account-row[data-depth="2"] .account-name { padding-left: 2.5rem; }
+.account-row[data-depth="3"] .account-name { padding-left: 3.75rem; }
+
+/* Register table */
+.register-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.register-table thead th {
+  position: sticky;
+  top: var(--nav-height);
+  background: var(--pico-background-color);
+  border-bottom: 2px solid var(--pico-muted-border-color);
+  padding: 0.5rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.register-table td {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--pico-muted-border-color);
+  vertical-align: top;
+}
+
+.register-table tr:hover td {
+  background: var(--pico-card-background-color);
+  cursor: pointer;
+}
+
+.register-table .col-date    { width: 6rem; white-space: nowrap; }
+.register-table .col-desc    { min-width: 8rem; }
+.register-table .col-amount  { width: 7rem; text-align: right; font-family: monospace; }
+.register-table .col-balance { width: 7rem; text-align: right; font-family: monospace; }
+.register-table .col-state   { width: 2.5rem; text-align: center; }
+
+.reconcile-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.25rem;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* FAB */
+.fab {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--pico-primary);
+  color: var(--pico-primary-inverse);
+  font-size: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  z-index: 200;
+  line-height: 1;
+}
+
+.fab:hover {
+  background: var(--pico-primary-hover);
+  color: var(--pico-primary-inverse);
+}
+
+/* Transaction form */
+.transaction-form {
+  max-width: 600px;
+}
+
+.split-row {
+  border: 1px solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  background: var(--pico-card-background-color);
+}
+
+.split-row .split-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--pico-muted-color);
+}
+
+.imbalance-indicator {
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--pico-border-radius);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.imbalance-indicator.balanced {
+  background: #d4edda;
+  color: #155724;
+}
+
+.imbalance-indicator.unbalanced {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Import preview */
+.import-preview-table {
+  width: 100%;
+  font-size: 0.85rem;
+}
+
+.import-preview-table td,
+.import-preview-table th {
+  padding: 0.4rem 0.5rem;
+}
+
+.import-preview-table tr.duplicate {
+  background: #fff3cd;
+}
+
+.import-preview-table tr.duplicate td:first-child::before {
+  content: "⚠ ";
+}
+
+/* Budget chart */
+#budget-chart {
+  width: 100%;
+  height: 300px;
+  margin-bottom: 1.5rem;
+}
+
+/* Budget table */
+.budget-table {
+  font-size: 0.82rem;
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+
+.budget-table td.over-budget  { color: #721c24; font-weight: 600; }
+.budget-table td.under-budget { color: #856404; }
+.budget-table td.on-budget    { color: #155724; }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 2px solid var(--pico-muted-border-color);
+  margin-bottom: 1rem;
+}
+
+.tabs a {
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  border-radius: var(--pico-border-radius) var(--pico-border-radius) 0 0;
+  color: var(--pico-muted-color);
+  font-size: 0.9rem;
+}
+
+.tabs a.active {
+  background: var(--pico-primary);
+  color: var(--pico-primary-inverse);
+}
+
+/* Inline form (register row edit) */
+.inline-form-row td {
+  padding: 0.5rem;
+}
+
+/* Htmx loading indicator */
+.htmx-indicator {
+  display: none;
+  color: var(--pico-muted-color);
+  font-size: 0.85rem;
+}
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+  display: inline;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .register-table .col-balance { display: none; }
+  main { padding: 0.5rem; }
+  nav.top-nav { gap: 0.25rem; }
+  nav.top-nav a { padding: 0.5rem; font-size: 0.85rem; }
+}

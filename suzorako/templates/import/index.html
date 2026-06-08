@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Import — Suzorako{% endblock %}
+
+{% block content %}
+<h2>Import de données</h2>
+
+<div class="tabs">
+  <a href="#csv" class="active" id="tab-csv" onclick="switchTab('csv'); return false;">GnuCash CSV</a>
+  <a href="#ofx" id="tab-ofx" onclick="switchTab('ofx'); return false;">OFX (banque)</a>
+</div>
+
+<div id="panel-csv">
+  <p>Exportez vos transactions depuis GnuCash via <strong>Fichier → Exporter → Exporter les transactions en CSV</strong>.</p>
+  <form hx-post="/import/csv"
+        hx-encoding="multipart/form-data"
+        hx-target="#import-result"
+        hx-indicator="#loading-csv">
+    <label>
+      Fichier CSV GnuCash
+      <input type="file" name="file" accept=".csv,text/csv" required>
+    </label>
+    <button type="submit">Analyser le fichier</button>
+    <span id="loading-csv" class="htmx-indicator"> Analyse en cours…</span>
+  </form>
+</div>
+
+<div id="panel-ofx" style="display:none;">
+  <p>Exportez vos relevés depuis votre espace bancaire en ligne au format OFX ou QFX.</p>
+  <form hx-post="/import/ofx"
+        hx-encoding="multipart/form-data"
+        hx-target="#import-result"
+        hx-indicator="#loading-ofx">
+    <label>
+      Fichier OFX / QFX
+      <input type="file" name="file" accept=".ofx,.qfx" required>
+    </label>
+    <button type="submit">Analyser le fichier</button>
+    <span id="loading-ofx" class="htmx-indicator"> Analyse en cours…</span>
+  </form>
+</div>
+
+<div id="import-result" style="margin-top:1.5rem;"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function switchTab(name) {
+  ['csv', 'ofx'].forEach(t => {
+    document.getElementById('panel-' + t).style.display = t === name ? '' : 'none';
+    document.getElementById('tab-' + t).classList.toggle('active', t === name);
+  });
+}
+</script>
+{% endblock %}

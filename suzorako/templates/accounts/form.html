@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}{% if account %}Modifier{% else %}Nouveau{% endif %} compte — Suzorako{% endblock %}
+
+{% block content %}
+<h2>{% if account %}Modifier le compte{% else %}Nouveau compte{% endif %}</h2>
+
+<form method="post"
+      action="{% if account %}/accounts/{{ account.id }}{% else %}/accounts{% endif %}"
+      class="transaction-form">
+
+  <label>
+    Nom du compte
+    <input type="text" name="name" value="{{ account.name if account else '' }}" required autofocus>
+  </label>
+
+  <label>
+    Type de compte
+    <select name="account_type" required>
+      {% for t in types %}
+      <option value="{{ t }}" {% if account and account.account_type == t %}selected{% endif %}>
+        {{ type_labels[t] }}
+      </option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <label>
+    Compte parent
+    <select name="parent_id">
+      <option value="">— aucun (compte racine) —</option>
+      {% for a in all_accounts %}
+      <option value="{{ a.id }}"
+        {% if account and account.parent_id == a.id %}selected{% endif %}>
+        {{ a.name }} ({{ type_labels[a.account_type] }})
+      </option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <label>
+    Devise
+    <select name="commodity_id">
+      <option value="">— EUR par défaut —</option>
+      {% for c in commodities %}
+      <option value="{{ c.id }}"
+        {% if account and account.commodity_id == c.id %}selected{% endif %}>
+        {{ c.mnemonic }} — {{ c.fullname or c.mnemonic }}
+      </option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <label>
+    Description
+    <input type="text" name="description" value="{{ account.description if account else '' }}">
+  </label>
+
+  <label style="display:flex;align-items:center;gap:0.5rem;">
+    <input type="checkbox" name="placeholder" value="1"
+      {% if account and account.placeholder %}checked{% endif %}
+      style="width:auto;">
+    Compte de regroupement (pas de saisie directe)
+  </label>
+  <input type="hidden" name="placeholder" value="0">
+
+  <div style="display:flex;gap:0.75rem;margin-top:1rem;">
+    <button type="submit">{% if account %}Enregistrer{% else %}Créer{% endif %}</button>
+    <a href="/accounts" role="button" class="secondary">Annuler</a>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% if not preview %}
+<p style="color:var(--pico-muted-color);">Aucune transaction trouvée dans ce fichier.</p>
+{% else %}
+<form hx-post="/import/confirm" hx-target="#import-result">
+  <input type="hidden" name="import_id" value="{{ import_id }}">
+
+  <p>
+    <strong>{{ preview | length }} transaction(s) trouvée(s)</strong>
+    {% set dupes = preview | selectattr('is_duplicate') | list | length %}
+    {% if dupes %} — <span style="color:#856404;">{{ dupes }} doublon(s) détecté(s)</span>{% endif %}
+  </p>
+
+  <div style="overflow-x:auto;">
+    <table class="import-preview-table">
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="select-all" onchange="toggleAll(this)"></th>
+          <th>Date</th>
+          <th>Description</th>
+          <th>Ventilations</th>
+          <th>Montant</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i, txn in preview | enumerate %}
+        <tr {% if txn.is_duplicate %}class="duplicate"{% endif %}>
+          <td>
+            <input type="checkbox" name="import_select" value="{{ i }}"
+              {% if not txn.is_duplicate %}checked{% endif %}>
+          </td>
+          <td style="white-space:nowrap;">{{ txn.post_date }}</td>
+          <td>{{ txn.description }}</td>
+          <td>
+            {% for j, sp in txn.splits | enumerate %}
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.25rem;">
+              <select name="account_{{ import_id }}_{{ i }}_{{ j }}" style="font-size:0.8rem;padding:0.2rem;">
+                <option value="">— non assigné —</option>
+                {% for a in all_accounts %}
+                <option value="{{ a.id }}" {% if sp.account_id == a.id %}selected{% endif %}>
+                  {{ a.name }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            {% endfor %}
+          </td>
+          <td style="text-align:right;font-family:monospace;white-space:nowrap;">
+            {% if txn.splits %}
+            {{ "%.2f €" | format(txn.splits[0].value_num / txn.splits[0].value_denom) }}
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div style="display:flex;gap:0.75rem;margin-top:1rem;">
+    <button type="submit">Importer les transactions sélectionnées</button>
+    <button type="button" onclick="document.getElementById('import-result').innerHTML=''" class="secondary outline">Annuler</button>
+  </div>
+</form>
+{% endif %}
+
+<script>
+function toggleAll(cb) {
+  document.querySelectorAll('input[name="import_select"]').forEach(c => c.checked = cb.checked);
+}
+</script>

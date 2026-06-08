@@ -1,0 +1,49 @@
+<div class="split-row" id="split-row-{{ i }}">
+  <div class="split-header">
+    <span>Ventilation {{ i + 1 }}</span>
+    {% if i >= 2 %}
+    <button type="button" onclick="this.closest('.split-row').remove()"
+      style="background:none;border:none;cursor:pointer;color:var(--pico-muted-color);">✕</button>
+    {% endif %}
+  </div>
+
+  <label>
+    Compte
+    <select name="split_account_{{ i }}"
+      hx-post="/transactions/check-balance"
+      hx-target="#imbalance-indicator"
+      hx-include="#txn-form"
+      hx-trigger="change"
+      required>
+      <option value="">— Choisir un compte —</option>
+      {% for a in all_accounts %}
+      <option value="{{ a.id }}"
+        {% if sp and sp.account_id == a.id %}selected
+        {% elif i == 0 and prefill_account_id and a.id == prefill_account_id %}selected
+        {% endif %}>
+        {{ a.name }}
+      </option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+    <label>
+      Montant (€)
+      <input type="text" inputmode="decimal"
+        name="split_amount_{{ i }}"
+        value="{% if sp %}{{ (sp.value_num / sp.value_denom) | round(2) }}{% endif %}"
+        placeholder="0.00"
+        hx-post="/transactions/check-balance"
+        hx-target="#imbalance-indicator"
+        hx-include="#txn-form"
+        hx-trigger="change">
+    </label>
+    <label>
+      Mémo
+      <input type="text" name="split_memo_{{ i }}"
+        value="{{ sp.memo if sp else '' }}"
+        placeholder="Optionnel">
+    </label>
+  </div>
+</div>

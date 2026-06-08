@@ -1,0 +1,48 @@
+{% for row in rows %}
+<tr id="row-split-{{ row.split_id }}"
+    onclick="window.location='/transactions/{{ row.transaction_id }}/edit'"
+    style="cursor:pointer;">
+  <td class="col-date">{{ row.post_date }}</td>
+  <td class="col-desc">
+    <div>{{ row.description }}</div>
+    {% if row.memo %}<small style="color:var(--pico-muted-color);">{{ row.memo }}</small>{% endif %}
+  </td>
+  <td>{{ row.transfer_account or '' }}</td>
+  <td class="col-amount {% if row.amount < 0 %}negative{% endif %}">
+    {{ row.amount_fmt }}
+  </td>
+  <td class="col-state">
+    <button
+      hx-post="/splits/{{ row.split_id }}/reconcile"
+      hx-target="this"
+      hx-swap="outerHTML"
+      class="reconcile-btn"
+      onclick="event.stopPropagation()"
+      title="{{ row.reconcile_state }}">
+      {% if row.reconcile_state == 'y' %}●{% elif row.reconcile_state == 'c' %}◐{% else %}○{% endif %}
+    </button>
+  </td>
+  <td>
+    <button
+      hx-delete="/transactions/{{ row.transaction_id }}"
+      hx-confirm="Supprimer cette transaction ?"
+      hx-target="#row-split-{{ row.split_id }}"
+      hx-swap="outerHTML"
+      onclick="event.stopPropagation()"
+      style="background:none;border:none;cursor:pointer;color:var(--pico-muted-color);font-size:0.85rem;padding:0.25rem;"
+      title="Supprimer">✕</button>
+  </td>
+</tr>
+{% endfor %}
+
+{% if has_more %}
+<tr id="scroll-sentinel-{{ offset }}"
+    hx-get="/accounts/{{ account_id }}/register/rows?offset={{ offset }}"
+    hx-trigger="intersect once"
+    hx-target="this"
+    hx-swap="outerHTML">
+  <td colspan="6" style="text-align:center;color:var(--pico-muted-color);padding:1rem;">
+    <span class="htmx-indicator">Chargement…</span>
+  </td>
+</tr>
+{% endif %}

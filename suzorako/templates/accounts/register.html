@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ account.name }} — Registre — Suzorako{% endblock %}
+
+{% block content %}
+<div style="display:flex;align-items:center;gap:1rem;margin-bottom:0.75rem;flex-wrap:wrap;">
+  <div>
+    <h2 style="margin:0;">{{ account.name }}</h2>
+    <small style="color:var(--pico-muted-color);">Solde : <strong>{{ balance_fmt }}</strong></small>
+  </div>
+  <a href="/accounts" style="color:var(--pico-muted-color);font-size:0.85rem;margin-left:auto;">← Comptes</a>
+</div>
+
+<div style="overflow-x:auto;">
+  <table class="register-table">
+    <thead>
+      <tr>
+        <th class="col-date">Date</th>
+        <th class="col-desc">Description</th>
+        <th>Compte contrepartie</th>
+        <th class="col-amount">Montant</th>
+        <th class="col-state" title="Rapprochement">R</th>
+        <th style="width:3rem;"></th>
+      </tr>
+    </thead>
+    <tbody id="register-body">
+      {% include "partials/register_rows.html" %}
+    </tbody>
+  </table>
+</div>
+
+<a href="/transactions/new?account_id={{ account.id }}" class="fab" title="Nouvelle transaction">+</a>
+{% endblock %}

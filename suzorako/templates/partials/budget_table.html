@@ -1,0 +1,43 @@
+{% set months = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'] %}
+{% set month_keys = ['01','02','03','04','05','06','07','08','09','10','11','12'] %}
+
+{% if not rows %}
+<p style="color:var(--pico-muted-color);">Aucune donnée pour {{ year }}.</p>
+{% else %}
+<div style="overflow-x:auto;">
+  <table class="budget-table">
+    <thead>
+      <tr>
+        <th>Compte</th>
+        {% for m in months %}<th style="text-align:right;white-space:nowrap;">{{ m }}</th>{% endfor %}
+        <th style="text-align:right;">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% set ns = namespace(current_type='') %}
+      {% for row in rows %}
+        {% if row.account_type != ns.current_type %}
+          {% set ns.current_type = row.account_type %}
+          <tr>
+            <td colspan="14" class="account-group-header">
+              {% if row.account_type == 'INCOME' %}Revenus{% else %}Dépenses{% endif %}
+            </td>
+          </tr>
+        {% endif %}
+        <tr>
+          <td>{{ row.name }}</td>
+          {% for mk in month_keys %}
+          <td style="text-align:right;font-family:monospace;">
+            {% set v = row.months[mk] %}
+            {% if v %}{{ "%.0f" | format(v) }}{% endif %}
+          </td>
+          {% endfor %}
+          <td style="text-align:right;font-family:monospace;font-weight:600;">
+            {{ "%.0f" | format(row.annual_total) }}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}

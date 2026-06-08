@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}{% if transaction %}Modifier la transaction{% else %}Nouvelle transaction{% endif %} — Suzorako{% endblock %}
+
+{% block content %}
+<h2>{% if transaction %}Modifier la transaction{% else %}Nouvelle transaction{% endif %}</h2>
+
+<form
+  method="post"
+  action="{% if transaction %}/transactions/{{ transaction.id }}{% else %}/transactions{% endif %}"
+  class="transaction-form"
+  id="txn-form">
+
+  {% if prefill_account_id %}
+  <input type="hidden" name="redirect_account_id" value="{{ prefill_account_id }}">
+  {% endif %}
+
+  <label>
+    Date
+    <input type="date" name="post_date"
+      value="{{ transaction.post_date if transaction else today }}"
+      required>
+  </label>
+
+  <label>
+    Description
+    <input type="text" name="description"
+      value="{{ transaction.description if transaction else '' }}"
+      list="descriptions-list"
+      autocomplete="off"
+      placeholder="Ex : Courses, Loyer, Salaire…"
+      required>
+    <datalist id="descriptions-list">
+      {% for d in descriptions %}
+      <option value="{{ d }}">
+      {% endfor %}
+    </datalist>
+  </label>
+
+  <label>
+    Notes (optionnel)
+    <input type="text" name="notes" value="{{ transaction.notes if transaction else '' }}">
+  </label>
+
+  <hr>
+  <p><strong>Ventilations</strong></p>
+
+  <div id="splits-container">
+    {% if transaction %}
+      {% for i, sp in transaction.splits | enumerate %}
+      {% include "partials/split_row.html" %}
+      {% endfor %}
+    {% else %}
+      {% set i = 0 %}{% set sp = None %}
+      {% include "partials/split_row.html" %}
+      {% set i = 1 %}
+      {% include "partials/split_row.html" %}
+    {% endif %}
+  </div>
+
+  <div id="imbalance-indicator" class="imbalance-indicator unbalanced">
+    Renseignez les montants
+  </div>
+
+  <button type="button"
+    hx-get="/transactions/split-row?idx={{ (transaction.splits | length) if transaction else 2 }}"
+    hx-target="#splits-container"
+    hx-swap="beforeend"
+    class="secondary outline"
+    style="width:100%;margin-bottom:1rem;">
+    + Ajouter une ventilation
+  </button>
+
+  <button type="submit" style="width:100%;">
+    {% if transaction %}Enregistrer{% else %}Créer la transaction{% endif %}
+  </button>
+  <a href="javascript:history.back()" role="button" class="secondary outline" style="width:100%;text-align:center;display:block;margin-top:0.5rem;">
+    Annuler
+  </a>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Recalcul déséquilibre à chaque changement de montant
+document.getElementById('txn-form').addEventListener('change', function(e) {
+  if (e.target.name && e.target.name.startsWith('split_amount_')) {
+    htmx.trigger('#txn-form', 'balance-check');
+  }
+});
+</script>
+{% endblock %}

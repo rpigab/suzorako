@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Comptes — Suzorako{% endblock %}
+
+{% block content %}
+<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+  <h2 style="margin:0;">Plan comptable</h2>
+  <a href="/accounts/new" role="button">+ Nouveau compte</a>
+</div>
+
+{% for type_key in types_order %}
+{% set accts = grouped[type_key] %}
+{% if accts %}
+<p class="account-group-header">{{ type_labels[type_key] }}</p>
+<ul class="account-tree">
+  {% for acct in accts %}
+  <li>
+    <div class="account-row" data-depth="{{ acct.depth }}">
+      <a href="/accounts/{{ acct.id }}/register" class="account-name" style="text-decoration:none;color:inherit;flex:1;">
+        {{ acct.name }}
+      </a>
+      <span class="badge {{ acct.account_type | lower }}">{{ type_labels[acct.account_type] }}</span>
+      <span class="account-balance {% if acct.balance < 0 %}negative{% endif %}">
+        {{ acct.balance_fmt }}
+      </span>
+      <a href="/accounts/{{ acct.id }}/edit" style="color:var(--pico-muted-color);font-size:0.85rem;text-decoration:none;padding:0.25rem 0.5rem;">✎</a>
+      <button
+        hx-delete="/accounts/{{ acct.id }}"
+        hx-confirm="Masquer le compte « {{ acct.name }} » ?"
+        hx-target="closest li"
+        hx-swap="outerHTML"
+        style="background:none;border:none;cursor:pointer;color:var(--pico-muted-color);font-size:0.85rem;padding:0.25rem 0.5rem;"
+        title="Masquer">✕</button>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endfor %}
+
+{% set has_accounts = namespace(value=false) %}
+{% for t in types_order %}{% if grouped[t] %}{% set has_accounts.value = true %}{% endif %}{% endfor %}
+{% if not has_accounts.value %}
+<p style="color:var(--pico-muted-color);text-align:center;margin-top:3rem;">
+  Aucun compte. <a href="/accounts/new">Créez votre premier compte</a> ou importez un fichier GnuCash.
+</p>
+{% endif %}
+{% endblock %}
